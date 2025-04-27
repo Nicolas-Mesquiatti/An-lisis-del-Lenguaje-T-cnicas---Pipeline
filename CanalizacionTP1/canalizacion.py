@@ -13,7 +13,7 @@ Analizar el mismo y redactar un informe con las conclusiones obtenidas.
 """
 #CANALIZACION COPIANDO LAS ORACIONES EN UNA VARIABLE Y TRABAJANDO SIN IMPORTAR DESDE ALGUN OTRO ARCHIVO
 
-#1)Realizamos las importaciones
+#1)Realizamos las importaciones de librerias que vamos a usar en todo el ejercicio
 import nltk #Biblioteca principal que usamos
 import string  # Para manejar puntuación
 from nltk.tokenize import word_tokenize, sent_tokenize  # Tokenización de palabras y oraciones
@@ -29,7 +29,7 @@ oraciones=["Python is an interpreted and high-level language, while CPlus is a c
 #Unimos las oraciones en una sola cadena
 texto = " ".join(oraciones)
 
-#2)Definimos la función para tokenizar el texto
+#2)Definimos la función para tokenizar el texto, tokenizar el texto es separar palabra por palabra el texto en una lista
 def tokenizar(texto):
     # Tokenizamos el texto en palabras
     tokens = word_tokenize(texto)
@@ -40,7 +40,7 @@ texto_tokenizado =tokenizar(texto)
 
 #print("-"*70)
 
-#3)Definimos la función para quitar stopwords
+#3)Definimos la función para quitar stopwords(quitamos palabras vacias)
 def quitarStopwords_eng(texto):
     ingles = stopwords.words("english")
     texto_limpio = [
@@ -54,7 +54,7 @@ def quitarStopwords_eng(texto):
 texto_limpio = quitarStopwords_eng(texto_tokenizado)
 #print(texto_limpio) #Imprimimos el texto limpio sin stopwords
 
-#4)Defino la función para obtener el pos de una palabra
+#4)Defino la función para obtener el pos de una palabra(separamos la palabra en verbo adjetivo o sustantivo)
 def get_wordnet_pos(word):
     tag = nltk.pos_tag([word])[0][1][0].upper()
     tag_dict = {"J": wordnet.ADJ,
@@ -79,17 +79,22 @@ print("Texto sin stopwords:", texto_limpio)
 print("-"*70)
 print("Texto lematizado:", lematizar(texto_limpio))
 
+#Aca preparo el corpus para tener todas las oraciones tokenizadas y separadas
+corpus = [lematizar(quitarStopwords_eng(tokenizar(oracion))) for oracion in oraciones]
+corpus_final = [" ".join(oracion) for oracion in corpus]
+print ("Oraciones a analizar del corpus : ",corpus_final)
+
+#Caso para convertir las palabras a numero
 #Tf - idf
 vectorizer = TfidfVectorizer()
 #De corpus use las oraciones del txt
-X = vectorizer.fit_transform(oraciones)
+X = vectorizer.fit_transform(corpus_final)
 #aca printeo la matriz
 print("Matriz TF-IDF:")
 print(X.toarray())
 #aca printeo el vocabulario
 print("\nVocabulario:")
 print(vectorizer.get_feature_names_out())
-
 
 # Obtengo las 6 palabras más usadas en todo el corpus
 frecuencia = FreqDist(lematizar(quitarStopwords_eng(texto_limpio)))
